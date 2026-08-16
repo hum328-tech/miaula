@@ -315,14 +315,12 @@ el("prevBtn").onclick=()=>{if(state.selected>1){state.selected--;renderTeacher()
 el("nextBtn").onclick=()=>{if(state.selected<48){state.selected++;renderTeacher()}};
 el("saveNotes").onclick=()=>{localStorage.setItem(key(state.group,`notes_${state.selected}`),el("groupNotes").value);const b=el("saveNotes"),old=b.textContent;b.textContent="✓ Guardado";setTimeout(()=>b.textContent=old,1000)};
 
-});
-
-
 useGradeData();
 el("studentGrade").onchange=e=>{
   currentGrade=e.target.value;
   localStorage.setItem("hist_grade",currentGrade);
   useGradeData();
+  updateGroupOptions();
   el("studentClassInput").value=published(el("studentGroup").value);
   renderStudent();
 };
@@ -330,15 +328,29 @@ el("teacherGrade").onchange=e=>{
   currentGrade=e.target.value;
   localStorage.setItem("hist_grade",currentGrade);
   useGradeData();
+  updateGroupOptions();
   state.selected=published(state.group);
   renderTeacher();
 };
 
 
+
+function updateGroupOptions(){
+  const sg=el("studentGroup"), tg=el("groupSelect");
+  const currentS=sg.value, currentT=tg.value;
+  const labels=[`${currentGrade}A`,`${currentGrade}B`,`${currentGrade}C`];
+  sg.innerHTML=labels.map(x=>`<option>${x}</option>`).join("");
+  tg.innerHTML=labels.map(x=>`<option>${x}</option>`).join("");
+  if(labels.includes(currentS)) sg.value=currentS; else sg.value=labels[0];
+  if(labels.includes(currentT)) tg.value=currentT; else tg.value=labels[0];
+  state.group=tg.value;
+}
+
 function openGrade(grade){
   currentGrade=String(grade);
   localStorage.setItem("hist_grade",currentGrade);
   useGradeData();
+  updateGroupOptions();
   el("homeView").classList.add("hidden");
   el("teacherView").classList.add("hidden");
   el("studentView").classList.remove("hidden");
